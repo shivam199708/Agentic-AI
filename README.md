@@ -1,37 +1,104 @@
-# Reflective Research Agent (FastAPI + Postgres, single container)
+# Agentic AI Research Agent
 
-A FastAPI web app that plans a research workflow, runs tool-using agents (Tavily, arXiv, Wikipedia), and stores task state/results in Postgres.
-This repo includes a Docker setup that runs **Postgres + the API in one container** (for local/dev).
+A FastAPI-based agentic AI research system that uses tool-using agents to conduct comprehensive research workflows. The project is currently in early development stages.
 
-## Features
+## Project Status
 
-* `/` serves a simple UI (Jinja2 template) to kick off a research task.
-* `/generate_report` kicks off a threaded, multi-step agent workflow (planner → research/writer/editor).
-* `/task_progress/{task_id}` live status for each step/substep.
-* `/task_status/{task_id}` final status + report.
+🚀 **Just Getting Started** - Currently setting up the foundational architecture with Docker containerization.
+
+## Overview
+
+This project aims to build a FastAPI web application that orchestrates intelligent research agents using LLMs. The initial setup focuses on establishing a robust Docker-based development environment.
+
+## Key Components (In Development)
+
+* Multi-step agent workflows for research planning and execution
+* Integration with external research tools (APIs, search engines, etc.)
+* Task management and progress tracking
+* Web-based UI for launching research tasks
 
 ---
 
-## Project layout (key paths)
+## Quick Start with Docker
+
+### Prerequisites
+
+* **Docker** (Desktop on Windows/macOS, or engine on Linux)
+
+### Setup
+
+1. **Create a `.env` file** in the project root with your API credentials:
+
+   ```bash
+   OPENAI_API_KEY=your-open-api-key
+   TAVILY_API_KEY=your-tavily-api-key
+   ```
+
+2. **Build the Docker image:**
+
+   ```bash
+   docker build -t agentic-ai .
+   ```
+
+3. **Run the container:**
+
+   ```bash
+   docker run --rm -it -p 8000:8000 -p 5432:5432 \
+     --name agentic-ai \
+     --env-file .env \
+     agentic-ai
+   ```
+
+### Access the Application
+
+* **Web UI:** [http://localhost:8000/](http://localhost:8000/)
+* **API Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
+
+### Stop the Container
+
+Press `Ctrl+C` in the terminal where the container is running, or in another terminal:
+
+```bash
+docker stop agentic-ai
+```
+
+---
+
+## Project Structure
 
 ```
-.
-├─ main.py                      # FastAPI app (your file shown above)
+agentic-ai/
+├─ main.py                      # FastAPI application entry point
 ├─ src/
-│  ├─ planning_agent.py         # planner_agent(), executor_agent_step()
-│  ├─ agents.py                 # research_agent, writer_agent, editor_agent  (example)
-│  └─ research_tools.py         # tavily_search_tool, arxiv_search_tool, wikipedia_search_tool
+│  ├─ planning_agent.py         # Planning logic for research workflows
+│  ├─ agents.py                 # Individual agent implementations
+│  └─ research_tools.py         # External tool integrations
 ├─ templates/
-│  └─ index.html                # UI page rendered by "/"
-├─ static/                      # optional static assets (css/js)
+│  └─ index.html                # Web UI
+├─ static/                      # Static assets (CSS, JS, images)
 ├─ docker/
-│  └─ entrypoint.sh             # starts Postgres, prepares DB, then launches Uvicorn
-├─ requirements.txt
-├─ Dockerfile
-└─ README.md
+│  └─ entrypoint.sh             # Docker container startup script
+├─ requirements.txt             # Python dependencies
+├─ Dockerfile                   # Container configuration
+└─ README.md                    # This file
 ```
 
-> Make sure `templates/index.html` and (optionally) `static/` exist and are copied into the image.
+---
+
+## Environment Variables
+
+Create a `.env` file in the project root:
+
+```bash
+# Required
+OPENAI_API_KEY=your-open-api-key
+TAVILY_API_KEY=your-tavily-api-key
+
+# Optional (defaults provided)
+# POSTGRES_USER=app
+# POSTGRES_PASSWORD=local
+# POSTGRES_DB=appdb
+```
 
 ---
 
@@ -107,28 +174,39 @@ INFO:     Uvicorn running on http://0.0.0.0:8000
 
 ---
 
-## API quickstart
+## Troubleshooting
 
-### Kick off a run
+**Container fails to start**
+
+* Ensure Docker is running and you have sufficient disk space
+* Check that ports 8000 and 5432 are not already in use
+* Run with verbose logging: `docker run ... --name agentic-ai 2>&1 | head -50`
+
+**API errors related to API keys**
+
+* Verify your `.env` file is in the project root and has correct formatting
+* Ensure you're passing it correctly: `--env-file .env`
+* For OpenAI: Make sure your API key has the necessary permissions
+
+**Database connection issues**
+
+* The container initializes the database automatically
+* If issues persist, remove and rebuild: `docker stop agentic-ai && docker rm agentic-ai && docker build -t agentic-ai .`
+
+**View container logs**
 
 ```bash
-curl -X POST http://localhost:8000/generate_report \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "Large Language Models for scientific discovery", "model":"openai:gpt-4o"}'
-# -> {"task_id": "UUID..."}
+docker logs -f agentic-ai
 ```
 
-### Poll progress
+---
 
-```bash
-curl http://localhost:8000/task_progress/<TASK_ID>
-```
+## Next Steps
 
-### Final status + report
-
-```bash
-curl http://localhost:8000/task_status/<TASK_ID>
-```
+- [ ] Complete core agent implementations
+- [ ] Add comprehensive testing suite
+- [ ] Optimize research workflows
+- [ ] Deploy to production environment
 
 ---
 
