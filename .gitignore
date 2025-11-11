@@ -188,7 +188,7 @@ cython_debug/
 #  you could uncomment the following to ignore the entire vscode folder
 # .vscode/
 
-# Ruff stuff:
+# Ruff stufF:
 .ruff_cache/
 
 # PyPI configuration file
